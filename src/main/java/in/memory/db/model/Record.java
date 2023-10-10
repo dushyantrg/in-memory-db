@@ -27,6 +27,6 @@ public class Record {
 
     @Override
     public String toString() {
-        return String.format("%s::%s", key, value);
+        return String.format("%s::%s\n", key, value);
     }
 }
