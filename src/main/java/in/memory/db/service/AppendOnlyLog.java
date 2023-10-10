@@ -27,15 +27,22 @@ public class AppendOnlyLog {
         this.logDirectory = logDirectory;
         this.logFileName = logFileName;
 
+        logFile = getLogFile(logDirectory, logFileName);
+        bufferedWriter = new BufferedWriter(new FileWriter(logFile, true));
+    }
+
+    private File getLogFile(String logDirectory, String logFileName) throws IOException {
+        final File logFile;
         Path logFilePath = Paths.get(logDirectory, logFileName);
         if(Files.exists(logFilePath)) {
             logFile = new File(logFilePath.toUri());
         }
         else {
+            Files.createDirectories(Paths.get(logDirectory));
             Files.createFile(logFilePath);
             logFile = logFilePath.toFile();
         }
-        bufferedWriter = new BufferedWriter(new FileWriter(logFile, true));
+        return logFile;
     }
 
     public void add(String key, String value) throws IOException {
