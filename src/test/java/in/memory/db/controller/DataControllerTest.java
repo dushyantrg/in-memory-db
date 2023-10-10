@@ -1,6 +1,8 @@
 package in.memory.db.controller;
 
 import io.micronaut.http.HttpRequest;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
@@ -19,17 +21,19 @@ public class DataControllerTest {
     HttpClient client;
 
     @Test
-    public void shouldReturnValueForAnExists() {
-        HttpRequest<?> request = HttpRequest.GET("/keys/key1").accept(MediaType.TEXT_PLAIN);
-        String body = client.toBlocking().retrieve(request);
-
-        assertNotNull(body);
-        assertEquals("key1", body);
+    public void shouldAddAValueForANewKey() {
+        HttpRequest<?> request = HttpRequest.PUT("/keys/key1/value/value1", null);
+        HttpResponse<Object> response = client.toBlocking().exchange(request);
+        assertEquals(HttpStatus.OK, response.getStatus());
     }
 
     @Test
-    public void shouldAddAValueForANewKey() {
-        HttpRequest<?> request = HttpRequest.PUT("/keys/key1/value/value1", null).accept(MediaType.TEXT_PLAIN);
+    public void shouldReturnValueForAnExistingKey() {
+        HttpRequest<?> request = HttpRequest.PUT("/keys/key1/value/value1", null);
+        HttpResponse<Object> response = client.toBlocking().exchange(request);
+        assertEquals(HttpStatus.OK, response.getStatus());
+
+        request = HttpRequest.GET("/keys/key1").accept(MediaType.TEXT_PLAIN);
         String body = client.toBlocking().retrieve(request);
 
         assertNotNull(body);
