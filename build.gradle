@@ -24,8 +24,8 @@ application {
     mainClass.set("in.memory.db.Application")
 }
 java {
-    sourceCompatibility = JavaVersion.toVersion("17")
-    targetCompatibility = JavaVersion.toVersion("17")
+    sourceCompatibility = JavaVersion.toVersion("20")
+    targetCompatibility = JavaVersion.toVersion("20")
 }
 
 graalvmNative.toolchainDetection = false
