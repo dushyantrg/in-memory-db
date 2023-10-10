@@ -32,7 +32,9 @@ public class AppendOnlyLog {
         logFile = getLogFile(logDirectory, logFileName);
         bufferedWriter = new BufferedWriter(new FileWriter(logFile, true));
         lastUpdateTime = System.nanoTime();
+        addFileCleanupHook();
     }
+
 
     private File getLogFile(String logDirectory, String logFileName) throws IOException {
         final File logFile;
@@ -64,4 +66,20 @@ public class AppendOnlyLog {
     public long getLastUpdateTime() {
         return lastUpdateTime;
     }
+
+    private void addFileCleanupHook() {
+        Runtime.getRuntime().addShutdownHook(getProfilingReportPrintingThread());
+    }
+
+    private Thread getProfilingReportPrintingThread() {
+        return new Thread(() -> {
+            try {
+                this.bufferedWriter.close();
+            } catch (IOException e) {
+                System.out.println("Error occurred while closing bufferedWriter");
+                e.printStackTrace();
+            }
+        });
+    }
+
 }
