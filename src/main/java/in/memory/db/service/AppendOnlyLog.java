@@ -51,7 +51,6 @@ public class AppendOnlyLog {
     public void add(String key, String value) throws IOException {
         bufferedWriter.write(new Record(key, value).toString());
         lastUpdateTime = System.nanoTime();
-        //System.out.printf("Key %s added at %s%n", key, lastUpdateTime);
     }
 
     public void flushToDisk() throws IOException {
