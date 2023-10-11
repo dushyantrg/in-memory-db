@@ -3,14 +3,10 @@ package in.memory.db;
 import io.micronaut.runtime.Micronaut;
 
 import java.io.IOException;
-import java.util.UUID;
 
 public class Application {
 
     public static void main(String[] args) throws IOException {
-
-        //printExecutionTimes();
-
 
         Micronaut.run(Application.class, args);
     }

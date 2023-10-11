@@ -1,18 +1,35 @@
 package in.memory.db.service;
 
+import io.micronaut.context.annotation.Value;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @MicronautTest
 public class KeyValueStoreTest {
 
+
+    @Value("${aol.dir}")
+    private  String logDirectory;
+
+    @Value("${aol.filename}")
+    private  String logFileName;
+
     @Inject
-    KeyValueStore keyValueStore;
+    private  KeyValueStore keyValueStore;
+
+    @AfterEach
+    public void cleanup() throws IOException {
+        Files.deleteIfExists(Path.of(logDirectory, logFileName));
+    }
+
 
     @Test
     public void shouldReturnAValueIfItsKeyExists() throws IOException {
@@ -36,6 +53,6 @@ public class KeyValueStoreTest {
     @Test
     public void shouldReturnEmptyStringIfKeyDoesNotExist() {
 
-        assertEquals("", keyValueStore.getValue("foo"));
+        assertEquals("Key Not Found", keyValueStore.getValue("foo"));
     }
 }

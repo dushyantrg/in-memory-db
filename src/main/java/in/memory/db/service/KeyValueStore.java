@@ -5,17 +5,26 @@ import jakarta.inject.Singleton;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 public class KeyValueStore {
 
+    private final AppendOnlyLog appendOnlyLog;
+    private final LogDeserializer logDeserializer;
+    private final Map<String, String> map;
+
     @Inject
-    private AppendOnlyLog appendOnlyLog;
-    private final Map<String, String> map = new ConcurrentHashMap<>();
+    public KeyValueStore(AppendOnlyLog appendOnlyLog, LogDeserializer logDeserializer) {
+        this.appendOnlyLog = appendOnlyLog;
+        this.logDeserializer = logDeserializer;
+        long startTime = System.nanoTime();
+        this.map = this.logDeserializer.createMapFromLogs();
+        long endTime = System.nanoTime();
+        System.out.printf("Time taken to deserialize log in map is %s%n",endTime-startTime);
+    }
 
     public String getValue(String key) {
-        return map.getOrDefault(key, "");
+        return map.getOrDefault(key, "Key Not Found");
     }
 
     public void putValue(String key, String value) throws IOException {
