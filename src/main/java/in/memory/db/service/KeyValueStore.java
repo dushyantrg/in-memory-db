@@ -15,7 +15,7 @@ public class KeyValueStore {
     public KeyValueStore(LogDeserializer logDeserializer) throws IOException {
         this.logDeserializer = logDeserializer;
         long startTime = System.nanoTime();
-        this.map = this.logDeserializer.cleanUpLogsAndcreateMap();
+        this.map = this.logDeserializer.createMapFromLogs();
         long endTime = System.nanoTime();
         System.out.printf("Time taken to deserialize log in map is %s%n",endTime-startTime);
     }
