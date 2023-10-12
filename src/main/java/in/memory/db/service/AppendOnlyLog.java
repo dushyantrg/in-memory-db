@@ -30,7 +30,7 @@ public class AppendOnlyLog {
         this.logFileName = logFileName;
 
         logFile = getLogFile(logDirectory, logFileName);
-        bufferedWriter = new BufferedWriter(new FileWriter(logFile, true));
+        bufferedWriter = new BufferedWriter(new FileWriter(logFile, true), 694460);
         lastUpdateTime = System.nanoTime();
         addFileCleanupHook();
     }
