@@ -35,6 +35,8 @@ public class LogDeserializer {
             try(BufferedReader reader = new BufferedReader(new FileReader(logFileOptional.get()))) {
                 return reader.lines()
                         .map(this::getRecordFromText)
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
                         .collect(Collectors.toConcurrentMap(Record::getKey, Record::getValue, (val1, val2) -> val2));
             }
             catch (IOException ex) {
@@ -45,9 +47,11 @@ public class LogDeserializer {
         return new ConcurrentHashMap<>();
     }
 
-    private Record getRecordFromText(String line) {
+    private Optional<Record> getRecordFromText(String line) {
         String[] tokens = line.split("::");
-        return new Record(tokens[0], tokens[1]);
+        if(tokens.length >= 2)
+            return Optional.of(new Record(tokens[0], tokens[1]));
+        return Optional.empty();
     }
 
     private Optional<File> getLogFile() {
