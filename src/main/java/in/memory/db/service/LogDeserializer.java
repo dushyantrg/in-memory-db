@@ -23,9 +23,13 @@ public class LogDeserializer {
 
     private final String logFileName;
 
-    public LogDeserializer(@Value("${aol.dir}") String logDirectory, @Value("${aol.filename}") String logFileName) {
+    private final int initialMapCapacity;
+
+    public LogDeserializer(@Value("${aol.dir}") String logDirectory, @Value("${aol.filename}") String logFileName,
+                           @Value("${aol.initialMapCapacity}") int initialMapCapacity) {
         this.logDirectory = logDirectory;
         this.logFileName = logFileName;
+        this.initialMapCapacity = initialMapCapacity;
     }
 
     public Map<String, String> createMapFromLogs() {
@@ -44,7 +48,7 @@ public class LogDeserializer {
             }
         }
 
-        return new ConcurrentHashMap<>(1620000);
+        return new ConcurrentHashMap<>(initialMapCapacity);
     }
 
     private Optional<Record> getRecordFromText(String line) {

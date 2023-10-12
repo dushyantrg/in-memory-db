@@ -25,12 +25,13 @@ public class AppendOnlyLog {
 
     private long lastUpdateTime;
 
-    public AppendOnlyLog(@Value("${aol.dir}") String logDirectory, @Value("${aol.filename}") String logFileName) throws IOException {
+    public AppendOnlyLog(@Value("${aol.dir}") String logDirectory, @Value("${aol.filename}") String logFileName,
+        @Value("${aol.bufferSize}") int bufferSize) throws IOException {
         this.logDirectory = logDirectory;
         this.logFileName = logFileName;
 
         logFile = getLogFile(logDirectory, logFileName);
-        bufferedWriter = new BufferedWriter(new FileWriter(logFile, true), 694460);
+        bufferedWriter = new BufferedWriter(new FileWriter(logFile, true), bufferSize);
         lastUpdateTime = System.nanoTime();
         addFileCleanupHook();
     }
