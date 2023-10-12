@@ -14,11 +14,11 @@ public class KeyValueStore {
     private final Map<String, String> map;
 
     @Inject
-    public KeyValueStore(AppendOnlyLog appendOnlyLog, LogDeserializer logDeserializer) {
+    public KeyValueStore(AppendOnlyLog appendOnlyLog, LogDeserializer logDeserializer) throws IOException {
         this.appendOnlyLog = appendOnlyLog;
         this.logDeserializer = logDeserializer;
         long startTime = System.nanoTime();
-        this.map = this.logDeserializer.createMapFromLogs();
+        this.map = this.logDeserializer.cleanUpLogsAndcreateMap();
         long endTime = System.nanoTime();
         System.out.printf("Time taken to deserialize log in map is %s%n",endTime-startTime);
     }
