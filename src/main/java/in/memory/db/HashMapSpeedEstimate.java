@@ -106,6 +106,9 @@ public class HashMapSpeedEstimate {
 
     private static void printExecutionTimes() throws IOException {
         HashMapSpeedEstimate estimate = new HashMapSpeedEstimate();
+
+        estimate.printTimesForStringConcatenation();
+        estimate.printTimesForStringFormat();
         String baseString = "key0123456789012345678901234567890123456789012345678901234567890";
         long count = 10000000;
         estimate.printHashMapInsertTimes(baseString, count);
@@ -129,5 +132,37 @@ public class HashMapSpeedEstimate {
         estimate.printFileAppendTimes(baseString, (int)count);
         estimate.printFileAppendTimes(baseString, (int)count);
         estimate.printFileAppendTimes(baseString, (int)count);
+    }
+
+    public void printTimesForStringConcatenation() {
+        String key = "1234567890", value = "0987654321", concat, format;
+        long startTime = System.nanoTime();
+        concat = key+"::"+value+"\n";
+        long endTime = System.nanoTime();
+        System.out.println("Time taken by string concat is "+(endTime - startTime));
+
+        startTime = System.nanoTime();
+        format = String.format("%s::%s\n", key, value);
+        endTime = System.nanoTime();
+        System.out.println("Time taken by string format is "+(endTime - startTime));
+
+        System.out.println(concat);
+        System.out.println(format);
+    }
+
+    public void printTimesForStringFormat() {
+        String key = "1234567890", value = "0987654321", concat, format;
+        long startTime = System.nanoTime();
+        format = String.format("%s::%s\n", key, value);
+        long endTime = System.nanoTime();
+        System.out.println("Time taken by string format is "+(endTime - startTime));
+
+        startTime = System.nanoTime();
+        concat = key+"::"+value+"\n";
+        endTime = System.nanoTime();
+        System.out.println("Time taken by string concat is "+(endTime - startTime));
+
+        System.out.println(concat);
+        System.out.println(format);
     }
 }
