@@ -1,5 +1,6 @@
 package in.memory.db.model;
 
+import java.time.LocalTime;
 import java.util.UUID;
 
 public class Record {
@@ -27,6 +28,6 @@ public class Record {
 
     @Override
     public String toString() {
-        return String.format("%s::%s\n", key, value);
+        return String.format("%s::%s::%s\n", key, value, LocalTime.now());
     }
 }
