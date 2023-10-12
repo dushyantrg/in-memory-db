@@ -44,7 +44,7 @@ public class LogDeserializer {
             }
         }
 
-        return new ConcurrentHashMap<>();
+        return new ConcurrentHashMap<>(1620000);
     }
 
     private Optional<Record> getRecordFromText(String line) {
