@@ -28,6 +28,6 @@ public class Record {
 
     @Override
     public String toString() {
-        return String.format("%s::%s::%s\n", key, value, LocalTime.now());
+        return String.format("%s::%s\n", key, value);
     }
 }
