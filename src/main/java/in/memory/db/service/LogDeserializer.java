@@ -23,9 +23,13 @@ public class LogDeserializer {
 
     private final String logFileName;
 
-    public LogDeserializer(@Value("${aol.dir}") String logDirectory, @Value("${aol.filename}") String logFileName) {
+    private final String keyValueSeparator;
+
+    public LogDeserializer(@Value("${aol.dir}") String logDirectory, @Value("${aol.filename}") String logFileName,
+                           @Value("${aol.key-value-separator}") String keyValueSeparator) {
         this.logDirectory = logDirectory;
         this.logFileName = logFileName;
+        this.keyValueSeparator = keyValueSeparator;
     }
 
     public Map<String, String> createMapFromLogs() {
@@ -46,7 +50,7 @@ public class LogDeserializer {
     }
 
     private Record getRecordFromText(String line) {
-        String[] tokens = line.split("::");
+        String[] tokens = line.split(keyValueSeparator);
         return new Record(tokens[0], tokens[1]);
     }
 

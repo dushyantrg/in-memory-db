@@ -25,8 +25,7 @@ public class Record {
         return value;
     }
 
-    @Override
-    public String toString() {
-        return String.format("%s::%s\n", key, value);
+    public String toString(String keyValueSeparator) {
+        return String.format("%s%s%s\n", key, keyValueSeparator, value);
     }
 }

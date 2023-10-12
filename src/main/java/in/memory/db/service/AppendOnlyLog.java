@@ -19,15 +19,19 @@ public class AppendOnlyLog {
 
     private final String logFileName;
 
+    private final String keyValueSeparator;
+
     private final File logFile;
 
     private final BufferedWriter bufferedWriter;
 
     private long lastUpdateTime;
 
-    public AppendOnlyLog(@Value("${aol.dir}") String logDirectory, @Value("${aol.filename}") String logFileName) throws IOException {
+    public AppendOnlyLog(@Value("${aol.dir}") String logDirectory, @Value("${aol.filename}") String logFileName,
+                         @Value("${aol.key-value-separator}") String keyValueSeparator) throws IOException {
         this.logDirectory = logDirectory;
         this.logFileName = logFileName;
+        this.keyValueSeparator = keyValueSeparator;
 
         logFile = getLogFile(logDirectory, logFileName);
         bufferedWriter = new BufferedWriter(new FileWriter(logFile, true));
@@ -51,7 +55,7 @@ public class AppendOnlyLog {
     }
 
     public void add(String key, String value) throws IOException {
-        bufferedWriter.write(new Record(key, value).toString());
+        bufferedWriter.write(new Record(key, value).toString(keyValueSeparator));
         lastUpdateTime = System.nanoTime();
     }
 
