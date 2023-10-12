@@ -8,14 +8,11 @@ import java.util.Map;
 
 @Context
 public class KeyValueStore {
-
-    private final AppendOnlyLog appendOnlyLog;
     private final LogDeserializer logDeserializer;
     private final Map<String, String> map;
 
     @Inject
-    public KeyValueStore(AppendOnlyLog appendOnlyLog, LogDeserializer logDeserializer) throws IOException {
-        this.appendOnlyLog = appendOnlyLog;
+    public KeyValueStore(LogDeserializer logDeserializer) throws IOException {
         this.logDeserializer = logDeserializer;
         long startTime = System.nanoTime();
         this.map = this.logDeserializer.cleanUpLogsAndcreateMap();
@@ -28,7 +25,10 @@ public class KeyValueStore {
     }
 
     public void putValue(String key, String value) throws IOException {
-        appendOnlyLog.add(key, value);
         map.put(key, value);
+    }
+
+    public Map<String, String> getData(){
+        return map;
     }
 }
