@@ -17,19 +17,19 @@ public class FileFlushingJob {
 
     private final int bufferSize;
 
-    private final File logFile;
+    private final Path logFilePath;
 
-    private final File newLogFile;
+    private final Path newLogFilePath;
 
-    private final File oldLogFile;
+    private final Path oldLogFilePath;
 
     public FileFlushingJob(KeyValueStore keyValueStore, @Value("${aol.dir}") String logDirectory, @Value("${aol.filename}") String logFileName,
-                           @Value("${aol.bufferSize}") int bufferSize) throws IOException {
+                           @Value("${aol.bufferSize}") int bufferSize) {
         this.keyValueStore = keyValueStore;
         this.bufferSize = bufferSize;
-        this.newLogFile = getLogFile(logDirectory, logFileName+".new");
-        this.logFile = getLogFile(logDirectory, logFileName);
-        this.oldLogFile = getLogFile(logDirectory, logFileName+".old");
+        this.newLogFilePath = Paths.get(logDirectory, logFileName+".new");
+        this.logFilePath = Paths.get(logDirectory, logFileName);
+        this.oldLogFilePath = Paths.get(logDirectory, logFileName+".old");
     }
 
     @Scheduled(fixedDelay = "${aol.flush-interval}")
@@ -41,7 +41,7 @@ public class FileFlushingJob {
 
     private boolean createNewSnapshotFromInMemoryData() {
         Map<String, String> map = keyValueStore.getData();
-        try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(newLogFile), bufferSize)) {
+        try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File(newLogFilePath.toUri())), bufferSize)) {
             for (Map.Entry<String, String> entry : map.entrySet()) {
                 String key = entry.getKey();
                 String value = entry.getValue();
@@ -58,14 +58,15 @@ public class FileFlushingJob {
 
     private void replaceOldLogsWithNewLogFile() throws IOException {
         try{
-            if(logFile.exists()) {
-                Files.move(logFile.toPath(), oldLogFile.toPath());
+            if(Files.exists(logFilePath)) {
+                Files.move(logFilePath, oldLogFilePath);
             }
-            Files.move(newLogFile.toPath(), logFile.toPath());
-            Files.deleteIfExists(oldLogFile.toPath());
+            Files.move(newLogFilePath, logFilePath);
+            Files.deleteIfExists(oldLogFilePath);
         }
         catch(IOException ex) {
             System.out.println("Error occurred while replacing old log file with new log file");
+            ex.printStackTrace();
         }
     }
 
