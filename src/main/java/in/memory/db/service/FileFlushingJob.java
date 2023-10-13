@@ -36,11 +36,8 @@ public class FileFlushingJob {
 
     @Scheduled(fixedDelay = "${aol.flush-interval}")
     void createSnapshotFromInMemoryData() throws IOException {
-        long startTime = System.nanoTime(), endTime;
         long lastUpdateTime = keyValueStore.getLastUpdateTime();
         if(this.lastUpdateTime >= lastUpdateTime) {
-            endTime = System.nanoTime();
-            System.out.printf("Time taken to run createSnapshotFromInMemoryData is %s nanoseconds\n", endTime - startTime);
             return;
         }
         this.lastUpdateTime = lastUpdateTime;
@@ -48,8 +45,6 @@ public class FileFlushingJob {
         if(createNewSnapshotFromInMemoryData()) {
             replaceOldLogsWithNewLogFile();
         }
-        endTime = System.nanoTime();
-        System.out.printf("Time taken to run createSnapshotFromInMemoryData with updates is %s nanoseconds\n", endTime - startTime);
     }
 
     private boolean createNewSnapshotFromInMemoryData() {
