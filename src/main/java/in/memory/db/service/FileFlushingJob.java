@@ -23,6 +23,8 @@ public class FileFlushingJob {
 
     private final Path oldLogFilePath;
 
+    private long lastUpdateTime;
+
     public FileFlushingJob(KeyValueStore keyValueStore, @Value("${aol.dir}") String logDirectory, @Value("${aol.filename}") String logFileName,
                            @Value("${aol.bufferSize}") int bufferSize) {
         this.keyValueStore = keyValueStore;
@@ -34,6 +36,12 @@ public class FileFlushingJob {
 
     @Scheduled(fixedDelay = "${aol.flush-interval}")
     void createSnapshotFromInMemoryData() throws IOException {
+        long lastUpdateTime = keyValueStore.getLastUpdateTime();
+        if(this.lastUpdateTime >= lastUpdateTime) {
+            return;
+        }
+        this.lastUpdateTime = lastUpdateTime;
+
         if(createNewSnapshotFromInMemoryData()) {
             replaceOldLogsWithNewLogFile();
         }
@@ -47,6 +55,7 @@ public class FileFlushingJob {
                 String value = entry.getValue();
                 bufferedWriter.write(new Record(key, value).toString());
             }
+            bufferedWriter.flush();
             return true;
         }
         catch (IOException ex) {

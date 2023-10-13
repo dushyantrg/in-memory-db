@@ -10,13 +10,14 @@ import java.util.Map;
 public class KeyValueStore {
     private final LogDeserializer logDeserializer;
     private final Map<String, String> map;
+    private long lastUpdateTime;
 
     @Inject
     public KeyValueStore(LogDeserializer logDeserializer) throws IOException {
         this.logDeserializer = logDeserializer;
         long startTime = System.nanoTime();
         this.map = this.logDeserializer.createMapFromLogs();
-        long endTime = System.nanoTime();
+        long endTime = this.lastUpdateTime = System.nanoTime();
         System.out.printf("Time taken to deserialize log in map is %s%n",endTime-startTime);
     }
 
@@ -25,10 +26,15 @@ public class KeyValueStore {
     }
 
     public void putValue(String key, String value) throws IOException {
+        lastUpdateTime = System.nanoTime();
         map.put(key, value);
     }
 
     public Map<String, String> getData(){
         return map;
+    }
+
+    public long getLastUpdateTime(){
+        return lastUpdateTime;
     }
 }
