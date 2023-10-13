@@ -3,13 +3,9 @@ package in.memory.db.service;
 import in.memory.db.model.Record;
 import io.micronaut.context.annotation.Value;
 import io.micronaut.scheduling.annotation.Scheduled;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,27 +19,53 @@ public class FileFlushingJob {
 
     private final File logFile;
 
+    private final File newLogFile;
+
+    private final File oldLogFile;
+
     public FileFlushingJob(KeyValueStore keyValueStore, @Value("${aol.dir}") String logDirectory, @Value("${aol.filename}") String logFileName,
                            @Value("${aol.bufferSize}") int bufferSize) throws IOException {
         this.keyValueStore = keyValueStore;
         this.bufferSize = bufferSize;
+        this.newLogFile = getLogFile(logDirectory, logFileName+".new");
         this.logFile = getLogFile(logDirectory, logFileName);
+        this.oldLogFile = getLogFile(logDirectory, logFileName+".old");
     }
 
     @Scheduled(fixedDelay = "${aol.flush-interval}")
-    void flushFileToDisk() throws IOException {
-        Map<String, String> map = keyValueStore.getData();
+    void createSnapshotFromInMemoryData() throws IOException {
+        if(createNewSnapshotFromInMemoryData()) {
+            replaceOldLogsWithNewLogFile();
+        }
+    }
 
-        try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(logFile), bufferSize)) {
+    private boolean createNewSnapshotFromInMemoryData() {
+        Map<String, String> map = keyValueStore.getData();
+        try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(newLogFile), bufferSize)) {
             for (Map.Entry<String, String> entry : map.entrySet()) {
                 String key = entry.getKey();
                 String value = entry.getValue();
                 bufferedWriter.write(new Record(key, value).toString());
             }
+            return true;
         }
         catch (IOException ex) {
             System.out.println("Error occurred while creating snapshot file");
             ex.printStackTrace();
+        }
+        return false;
+    }
+
+    private void replaceOldLogsWithNewLogFile() throws IOException {
+        try{
+            if(logFile.exists()) {
+                Files.move(logFile.toPath(), oldLogFile.toPath());
+            }
+            Files.move(newLogFile.toPath(), logFile.toPath());
+            Files.deleteIfExists(oldLogFile.toPath());
+        }
+        catch(IOException ex) {
+            System.out.println("Error occurred while replacing old log file with new log file");
         }
     }
 

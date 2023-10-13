@@ -11,7 +11,6 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -43,6 +42,7 @@ public class LogDeserializer {
             }
             catch (IOException ex) {
                 System.out.println("Error occurred while converting log file contents into records");
+                ex.printStackTrace();
             }
         }
 
