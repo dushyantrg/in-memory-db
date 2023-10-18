@@ -27,7 +27,7 @@ public class KeyValueStore {
         return map.getOrDefault(key, "Key Not Found");
     }
 
-    public void putValue(String key, String value) throws IOException {
+    public synchronized void putValue(String key, String value) throws IOException {
         this.map = appendOnlyLog.add(key, value, map);
         map.put(key, value);
     }

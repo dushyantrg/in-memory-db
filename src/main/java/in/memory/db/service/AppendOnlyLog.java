@@ -33,6 +33,7 @@ public class AppendOnlyLog {
     private long lastUpdateTime;
 
     private final AtomicInteger updateCount = new AtomicInteger();
+    private final int appendCountThreshold = 30_000;
 
     public AppendOnlyLog(@Value("${aol.dir}") String logDirectory, @Value("${aol.filename}") String logFileName,
         @Value("${aol.bufferSize}") int bufferSize) throws IOException {
@@ -61,14 +62,14 @@ public class AppendOnlyLog {
         return logFile;
     }
 
-    public synchronized Map<String, String> add(String key, String value, Map<String, String> map) throws IOException {
+    public Map<String, String> add(String key, String value, Map<String, String> map) throws IOException {
 
         int updatesCount = updateCount.addAndGet(1);
-        if(updatesCount > 30000) {
+        if(updatesCount > appendCountThreshold) {
             createSSTable(0, map);
             createNewLogFile();
             logFileCount++;
-            updateCount.set(0);
+            updateCount.set(1);
             bufferedWriter.write(new Record(key, value).toString());
             lastUpdateTime = System.nanoTime();
             return new ConcurrentHashMap<>();
