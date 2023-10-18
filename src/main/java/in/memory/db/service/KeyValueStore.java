@@ -11,7 +11,7 @@ public class KeyValueStore {
 
     private final AppendOnlyLog appendOnlyLog;
     private final LogDeserializer logDeserializer;
-    private final Map<String, String> map;
+    private Map<String, String> map;
 
     @Inject
     public KeyValueStore(AppendOnlyLog appendOnlyLog, LogDeserializer logDeserializer) throws IOException {
@@ -28,7 +28,7 @@ public class KeyValueStore {
     }
 
     public void putValue(String key, String value) throws IOException {
-        appendOnlyLog.add(key, value);
+        this.map = appendOnlyLog.add(key, value, map);
         map.put(key, value);
     }
 }
