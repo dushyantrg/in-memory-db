@@ -30,6 +30,8 @@ public class AppendOnlyLog {
 
     private int logFileCount = 0;
 
+    private long lastUpdateTime;
+
     private final AtomicInteger updateCount = new AtomicInteger();
 
     public AppendOnlyLog(@Value("${aol.dir}") String logDirectory, @Value("${aol.filename}") String logFileName,
@@ -40,6 +42,7 @@ public class AppendOnlyLog {
 
         logFile = getLogFile(logDirectory, logFileName);
         bufferedWriter = new BufferedWriter(new FileWriter(logFile, true), bufferSize);
+        lastUpdateTime = System.nanoTime();
         addFileCleanupHook();
     }
 
@@ -67,9 +70,11 @@ public class AppendOnlyLog {
             logFileCount++;
             updateCount.set(0);
             bufferedWriter.write(new Record(key, value).toString());
+            lastUpdateTime = System.nanoTime();
             return new ConcurrentHashMap<>();
         }
         bufferedWriter.write(new Record(key, value).toString());
+        lastUpdateTime = System.nanoTime();
         return map;
     }
 
@@ -104,7 +109,11 @@ public class AppendOnlyLog {
     }
 
     public boolean isInitialized() {
-        return updateCount.get() >= 0;
+        return lastUpdateTime > 0;
+    }
+
+    public long getLastUpdateTime() {
+        return lastUpdateTime;
     }
 
     private void addFileCleanupHook() {
