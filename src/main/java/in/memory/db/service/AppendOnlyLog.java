@@ -80,7 +80,7 @@ public class AppendOnlyLog {
 
     private void createSSTable(int level, Map<String, String> map) throws IOException {
 
-        File ssTable = getLogFile(logDirectory, "sstable_level"+level+"file"+logFileCount);
+        File ssTable = getLogFile(logDirectory, logFileCount+".ldb");
 
         TreeMap<String, String> treeMap = new TreeMap<>(map);
 
@@ -96,10 +96,9 @@ public class AppendOnlyLog {
     }
 
     private void createNewLogFile() throws IOException {
-        bufferedWriter.flush();
         this.bufferedWriter.close();
 
-        Files.move(logFile.toPath(), Path.of(logDirectory, logFileName+".level0_file"+logFileCount));
+        Files.move(logFile.toPath(), Path.of(logDirectory, logFileName+logFileCount+".log"));
         logFile = getLogFile(logDirectory, logFileName);
         bufferedWriter = new BufferedWriter(new FileWriter(logFile), bufferSize);
     }
